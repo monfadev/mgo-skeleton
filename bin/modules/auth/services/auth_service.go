@@ -1,6 +1,7 @@
 package services
 
 import (
+	"mgo-skeleton/bin/configs"
 	"mgo-skeleton/bin/modules/auth/models"
 	"mgo-skeleton/bin/modules/auth/repositories"
 	"mgo-skeleton/bin/pkg/helpers"
@@ -38,6 +39,7 @@ func (s *authService) Register(req *models.RegisterRequest) error {
 	user := models.UserModel{
 		Name:     req.Name,
 		Email:    req.Email,
+		Role:     configs.ROLE_ADMIN,
 		Password: passwordHash,
 	}
 
@@ -70,6 +72,7 @@ func (s *authService) Login(req *models.LoginRequest) (*models.LoginResponse, er
 	response = models.LoginResponse{
 		ID:    user.ID,
 		Name:  user.Name,
+		Role:  user.Role,
 		Token: token,
 	}
 
