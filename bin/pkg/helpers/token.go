@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"errors"
 	"fmt"
 	"mgo-skeleton/bin/modules/auth/models"
 	"time"
@@ -16,7 +17,9 @@ type JWTCustomClaims struct {
 }
 
 func GenerateToken(user *models.UserModel) (string, error) {
+	fmt.Println("\n")
 	fmt.Printf("GenerateToken struct with pointer is: %v", user.ID)
+	fmt.Println("\n")
 	claims := JWTCustomClaims{
 		user.ID,
 		jwt.RegisteredClaims{
@@ -30,4 +33,25 @@ func GenerateToken(user *models.UserModel) (string, error) {
 	ss, err := token.SignedString(key)
 
 	return ss, err
+}
+
+func ValidateToken(tokenStr string) (*int, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &JWTCustomClaims{}, func(t *jwt.Token) (interface{}, error) {
+		return key, nil
+	})
+
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			return nil, errors.New("invalid access")
+		}
+		return nil, errors.New("access expired")
+	}
+
+	/// casting to struct
+	claims, ok := token.Claims.(*JWTCustomClaims)
+	if !ok || !token.Valid {
+		return nil, errors.New("access invalid and expired")
+	}
+
+	return &claims.ID, nil
 }

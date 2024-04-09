@@ -2,7 +2,8 @@ package main
 
 import (
 	"mgo-skeleton/bin/configs"
-	"mgo-skeleton/bin/modules/auth/routes"
+	rauth "mgo-skeleton/bin/modules/auth/routes"
+	rteam "mgo-skeleton/bin/modules/team/routes"
 	"mgo-skeleton/bin/pkg/database/postgres"
 	"net/http"
 
@@ -34,7 +35,8 @@ func main() {
 
 	routerGroup := r.Group("/api")
 
-	routes.AuthRoute(routerGroup, db)
+	rauth.AuthRoute(routerGroup, db)
+	rteam.TeamRoute(routerGroup, db)
 
 	r.Run(":8080")
 }
