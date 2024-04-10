@@ -1,19 +1,23 @@
 package helpers
 
 type NotFoundError struct { //404
-	Message string
+	Message    string
+	MessageDev string
 }
 
 type BadRequestError struct { //400
-	Message string
+	Message    string
+	MessageDev string
 }
 
 type InternalServerError struct { //500
-	Message string
+	Message    string
+	MessageDev string
 }
 
 type UnauthorizedError struct { //401
-	Message string
+	Message    string
+	MessageDev string
 }
 
 func (e *NotFoundError) Error() string {

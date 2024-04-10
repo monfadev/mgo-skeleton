@@ -10,24 +10,24 @@ import (
 
 func JWTMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		authorizationHeader := ctx.GetHeader("Authorization")
-
-		if !strings.Contains(authorizationHeader, "Bearer") {
-			helpers.ErrorHandler(ctx, &helpers.UnauthorizedError{Message: "Unauthorized"})
-			return
-		}
-
-		tokenStr := strings.Replace(authorizationHeader, "Bearer ", "", -1)
+		tokenStr := ctx.GetHeader("Authorization")
 
 		if tokenStr == "" {
-			helpers.ErrorHandler(ctx, &helpers.UnauthorizedError{Message: "Unauthorized"})
+			helpers.ErrorHandler(ctx, &helpers.UnauthorizedError{Message: "Unauthorized", MessageDev: "token is empty"})
 			ctx.Abort()
 			return
 		}
 
-		userId, err := helpers.ValidateToken(tokenStr)
+		tokenArr := strings.Split(tokenStr, " ")
+		if len(tokenArr) != 2 {
+			helpers.ErrorHandler(ctx, &helpers.UnauthorizedError{Message: "Unauthorized", MessageDev: "token array split length is not 2"})
+			ctx.Abort()
+			return
+		}
+
+		userId, err := helpers.ValidateToken(tokenArr[1])
 		if err != nil {
-			helpers.ErrorHandler(ctx, &helpers.UnauthorizedError{Message: err.Error()})
+			helpers.ErrorHandler(ctx, &helpers.UnauthorizedError{Message: err.Error(), MessageDev: "validate token is empty"})
 			ctx.Abort()
 			return
 		}

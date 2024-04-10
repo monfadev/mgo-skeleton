@@ -24,8 +24,7 @@ func NewAuthRepository(db *gorm.DB) *authRepository {
 
 func (r *authRepository) EmailExist(email string) bool {
 	var user models.UserModel
-
-	err := r.db.Table("users").First(&user.Email, "email = ?", email).Error
+	err := r.db.Table("users").Where("email = ?", email).First(&user).Error
 
 	return err == nil
 }

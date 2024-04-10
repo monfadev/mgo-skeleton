@@ -13,6 +13,7 @@ var key = []byte("mgoskeleton")
 
 type JWTCustomClaims struct {
 	ID int `json:"id"`
+	// Email string `json:"email"`
 	jwt.RegisteredClaims
 }
 
@@ -22,6 +23,7 @@ func GenerateToken(user *models.UserModel) (string, error) {
 	fmt.Println("\n")
 	claims := JWTCustomClaims{
 		user.ID,
+		// user.Email,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(120 * time.Minute)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

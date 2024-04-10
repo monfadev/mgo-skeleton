@@ -24,7 +24,7 @@ func NewAuthServices(r repositories.AuthRepository) *authService {
 
 func (s *authService) Register(req *models.RegisterRequest) error {
 	if emailExist := s.repositories.EmailExist(req.Email); emailExist {
-		return &helpers.BadRequestError{Message: "email already registered"}
+		return &helpers.BadRequestError{Message: "email already registered", MessageDev: "emailexist"}
 	}
 
 	if req.Password != req.PasswordConfirmation {
@@ -60,7 +60,7 @@ func (s *authService) Login(req *models.LoginRequest) (*models.LoginResponse, er
 	}
 
 	if err := helpers.VerifyPassword(user.Password, req.Password); err != nil {
-		return nil, &helpers.NotFoundError{Message: "wrong password"}
+		return nil, &helpers.NotFoundError{Message: "wrong password", MessageDev: "hashedPassword is not the hash of the given password"}
 	}
 
 	token, err := helpers.GenerateToken(user)

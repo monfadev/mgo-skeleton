@@ -9,6 +9,10 @@ CREATE TABLE public.teams (
   email VARCHAR(255) NOT NULL UNIQUE,  -- Unique constraint for email
   role role_team NOT NULL,
   user_id INTEGER not null,
+  constraint fk_team_users_id
+  foreign key (user_id)
+  references users(id)
+  on delete set null,
   updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
   created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL  
 );
