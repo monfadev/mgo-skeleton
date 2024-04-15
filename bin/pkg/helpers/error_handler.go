@@ -14,31 +14,44 @@ func ErrorHandler(c *gin.Context, err error) {
 	switch err.(type) {
 	case *NotFoundError:
 		statusCode = http.StatusNotFound
-		fmt.Println("\n")
-		log.Println("--------Error Handler-------------")
-		log.Printf("NotFoundError, Message Developer is %s", err.Error())
-		log.Println("---------------------\n")
+
+		if notFoundErr, ok := err.(*NotFoundError); ok {
+			fmt.Println("\n")
+			log.Println("--------Error Handler-------------")
+			log.Printf("NotFoundError, Message is %s and Developer %s", err.Error(), notFoundErr.MessageDev)
+			log.Println("---------------------\n")
+		}
 
 	case *BadRequestError:
 		statusCode = http.StatusBadRequest
-		fmt.Println("\n")
-		fmt.Println("--------Error Handler-------------")
-		log.Printf("BadRequestError, Message Developer is %s", err.Error())
-		fmt.Println("---------------------\n")
+
+		if badRequestErr, ok := err.(*BadRequestError); ok {
+			fmt.Println("\n")
+			fmt.Println("--------Error Handler-------------")
+			log.Printf("BadRequestError, Message is %s and Developer %s", err.Error(), badRequestErr.MessageDev)
+			fmt.Println("---------------------\n")
+		}
 
 	case *InternalServerError:
 		statusCode = http.StatusInternalServerError
-		fmt.Println("\n")
-		log.Println("--------Error Handler-------------")
-		log.Printf("InternalServerError, Message Developer is %s", err.Error())
-		log.Println("---------------------\n")
+
+		if internalServerErr, ok := err.(*BadRequestError); ok {
+			fmt.Println("\n")
+			log.Println("--------Error Handler-------------")
+			log.Printf("InternalServerError, Message is %s and Developer", err.Error(), internalServerErr.MessageDev)
+			log.Println("---------------------\n")
+		}
 
 	case *UnauthorizedError:
 		statusCode = http.StatusUnauthorized
-		fmt.Println("\n")
-		log.Println("--------Error Handler-------------")
-		log.Printf("UnauthorizedError, Message Developer is %s", err.Error())
-		log.Println("---------------------\n")
+
+		if UnauthorizedErr, ok := err.(*BadRequestError); ok {
+
+			fmt.Println("\n")
+			log.Println("--------Error Handler-------------")
+			log.Printf("UnauthorizedError, Message is %s and Developer", err.Error(), UnauthorizedErr.MessageDev)
+			log.Println("---------------------\n")
+		}
 
 	}
 

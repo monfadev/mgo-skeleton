@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"mgo-skeleton/bin/modules/auth/models"
+	"mgo-skeleton/bin/pkg/helpers"
 
 	"gorm.io/gorm"
 )
@@ -39,7 +40,17 @@ func (r *authRepository) Register(user *models.UserModel) error {
 func (r *authRepository) GetUserByEmail(email string) (*models.UserModel, error) {
 	var user models.UserModel
 
-	err := r.db.Table("users").First(&user, "email = ?", email).Error
+	rows, err := r.db.Raw("select * from users where email = ? limit 1", email).Rows()
+	if err != nil {
+		return &user, err
+	}
 
-	return &user, err
+	defer rows.Close()
+
+	if rows.Next() {
+		r.db.ScanRows(rows, &user)
+		return &user, nil
+	}
+
+	return &user, &helpers.NotFoundError{Message: "email not found"}
 }

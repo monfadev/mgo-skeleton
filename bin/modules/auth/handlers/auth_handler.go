@@ -23,7 +23,7 @@ func (h *authHandler) Register(c *gin.Context) {
 	var register models.RegisterRequest
 
 	if err := c.ShouldBindJSON(&register); err != nil {
-		helpers.ErrorHandler(c, &helpers.BadRequestError{Message: err.Error()})
+		helpers.ErrorHandler(c, &helpers.BadRequestError{Message: err.Error(), MessageDev: "request body is not match"})
 		return
 	}
 
@@ -45,7 +45,7 @@ func (h *authHandler) Login(c *gin.Context) {
 	var login models.LoginRequest
 
 	if err := c.ShouldBindJSON(&login); err != nil {
-		helpers.ErrorHandler(c, &helpers.BadRequestError{Message: err.Error()})
+		helpers.ErrorHandler(c, &helpers.BadRequestError{Message: err.Error(), MessageDev: "request body is not match"})
 		return
 	}
 

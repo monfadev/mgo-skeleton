@@ -24,10 +24,10 @@ func NewAuthServices(r repositories.AuthRepository) *authService {
 
 func (s *authService) Register(req *models.RegisterRequest) error {
 	if emailExist := s.repositories.EmailExist(req.Email); emailExist {
-		return &helpers.BadRequestError{Message: "email already registered", MessageDev: "emailexist"}
+		return &helpers.BadRequestError{Message: "email already registered", MessageDev: "email exist"}
 	}
 
-	if req.Password != req.PasswordConfirmation {
+	if req.Password != req.PasswordConfirmation || req.PasswordConfirmation != req.Password {
 		return &helpers.BadRequestError{Message: "password not match"}
 	}
 
@@ -56,7 +56,7 @@ func (s *authService) Login(req *models.LoginRequest) (*models.LoginResponse, er
 
 	user, err := s.repositories.GetUserByEmail(req.Email)
 	if err != nil {
-		return nil, &helpers.NotFoundError{Message: "wrong email"}
+		return nil, &helpers.NotFoundError{Message: "wrong email", MessageDev: "email is not found in db"}
 	}
 
 	if err := helpers.VerifyPassword(user.Password, req.Password); err != nil {

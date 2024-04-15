@@ -4,12 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"mgo-skeleton/bin/modules/auth/models"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 )
 
-var key = []byte("mgoskeleton")
+var key = []byte(os.Getenv("KEY_JWT"))
 
 type JWTCustomClaims struct {
 	ID int `json:"id"`
