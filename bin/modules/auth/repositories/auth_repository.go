@@ -52,5 +52,17 @@ func (r *authRepository) GetUserByEmail(email string) (*models.UserModel, error)
 		return &user, nil
 	}
 
+	rowsTeams, err := r.db.Raw("select * from teams where email = ? limit 1", email).Rows()
+	if err != nil {
+		return &user, err
+	}
+
+	defer rowsTeams.Close()
+
+	if rowsTeams.Next() {
+		r.db.ScanRows(rowsTeams, &user)
+		return &user, nil
+	}
+
 	return &user, &helpers.NotFoundError{Message: "email not found"}
 }
