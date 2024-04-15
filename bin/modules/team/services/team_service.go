@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"mgo-skeleton/bin/modules/team/models"
 	"mgo-skeleton/bin/modules/team/repositories"
 	"mgo-skeleton/bin/pkg/helpers"
@@ -8,6 +9,8 @@ import (
 
 type TeamService interface {
 	Create(req *models.TeamRequest) error
+	Detail(id int) (*models.TeamResponse, error)
+	Delete(id int, userId int) error
 }
 
 type teamService struct {
@@ -22,8 +25,12 @@ func NewTeamService(r repositories.TeamRepository) *teamService {
 
 func (s *teamService) Create(req *models.TeamRequest) error {
 
-	if req.Password != req.PasswordConfirmation {
-		return &helpers.BadRequestError{Message: "password not match"}
+	if emailExist := s.repositories.EmailExist(req.Email); emailExist {
+		return &helpers.BadRequestError{Message: "email already registered", MessageDev: "email already registered in teams"}
+	}
+
+	if req.Password != req.PasswordConfirmation || req.PasswordConfirmation != req.Password {
+		return &helpers.BadRequestError{Message: "password not match", MessageDev: "password is not match in teams"}
 	}
 
 	passwordHash, err := helpers.HashPassword(req.Password)
@@ -40,6 +47,37 @@ func (s *teamService) Create(req *models.TeamRequest) error {
 	}
 
 	if err := s.repositories.Create(&user); err != nil {
+		return &helpers.InternalServerError{Message: err.Error()}
+	}
+
+	return nil
+}
+
+func (s *teamService) Detail(id int) (*models.TeamResponse, error) {
+	response, err := s.repositories.Detail(id)
+
+	if err != nil {
+		return nil, &helpers.BadRequestError{Message: "user not found"}
+	}
+
+	return &response, nil
+}
+
+func (s *teamService) Delete(id int, userId int) error {
+	detailUser, err := s.Detail(id)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("delete team id is ", id)
+	fmt.Println("delete team userId is ", userId)
+	fmt.Println("delete team detailUser.UserId is ", detailUser.UserId)
+
+	if userId != detailUser.UserId {
+		return &helpers.BadRequestError{Message: "it is not your user team"}
+	}
+
+	if err := s.repositories.Delete(id, userId); err != nil {
 		return &helpers.InternalServerError{Message: err.Error()}
 	}
 

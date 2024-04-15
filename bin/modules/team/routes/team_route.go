@@ -18,5 +18,6 @@ func TeamRoute(r *gin.RouterGroup, db *gorm.DB) {
 	r.Use(middlewares.JWTMiddleware())
 
 	r.POST("/team", teamHandler.Create)
-
+	r.GET("/:id/team", teamHandler.Detail)
+	r.DELETE("/:id/team", teamHandler.Delete)
 }
