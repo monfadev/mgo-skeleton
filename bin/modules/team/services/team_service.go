@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"math"
 	"mgo-skeleton/bin/modules/team/models"
 	"mgo-skeleton/bin/modules/team/repositories"
 	"mgo-skeleton/bin/pkg/helpers"
@@ -9,6 +10,7 @@ import (
 
 type TeamService interface {
 	Create(req *models.TeamRequest) error
+	FindAll(params *helpers.FilterParams, userId int) (*[]models.TeamResponse, *helpers.Paginate, error)
 	Detail(id int) (*models.TeamResponse, error)
 	Delete(id int, userId int) error
 }
@@ -51,6 +53,30 @@ func (s *teamService) Create(req *models.TeamRequest) error {
 	}
 
 	return nil
+}
+
+func (s *teamService) FindAll(params *helpers.FilterParams, userId int) (*[]models.TeamResponse, *helpers.Paginate, error) {
+	fmt.Println("params limit is ", params.Limit)
+	count, err := s.repositories.TotalData(params, userId)
+	fmt.Println("count is ", count)
+	if err != nil {
+		return nil, nil, &helpers.InternalServerError{Message: err.Error()}
+	}
+
+	response, err := s.repositories.FindAll(params, userId)
+	if err != nil {
+		return nil, nil, &helpers.InternalServerError{Message: err.Error()}
+	}
+
+	paginate := &helpers.Paginate{
+		Total:     int(count),
+		PerPage:   params.Limit,
+		Page:      params.Page,
+		TotalPage: int(math.Ceil(float64(count) / float64(params.Limit))),
+	}
+
+	return response, paginate, nil
+
 }
 
 func (s *teamService) Detail(id int) (*models.TeamResponse, error) {

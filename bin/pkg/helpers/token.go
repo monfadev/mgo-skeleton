@@ -14,7 +14,7 @@ var key = []byte(os.Getenv("KEY_JWT"))
 
 type JWTCustomClaims struct {
 	ID int `json:"id"`
-	// Email string `json:"email"`
+	// Role string `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -24,7 +24,7 @@ func GenerateToken(user *models.UserModel) (string, error) {
 	fmt.Println("\n")
 	claims := JWTCustomClaims{
 		user.ID,
-		// user.Email,
+		// user.Role,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(120 * time.Minute)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -55,6 +55,8 @@ func ValidateToken(tokenStr string) (*int, error) {
 	if !ok || !token.Valid {
 		return nil, errors.New("access invalid and expired")
 	}
+
+	fmt.Println("claims is ", claims)
 
 	return &claims.ID, nil
 }

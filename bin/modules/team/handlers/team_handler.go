@@ -44,6 +44,47 @@ func (h *teamHandler) Create(c *gin.Context) {
 
 }
 
+func (h *teamHandler) Get(c *gin.Context) {
+
+	/// without param filter
+	/*
+		page := c.DefaultQuery("page", "1")
+		limit := c.DefaultQuery("limit", "5")
+		search := c.Query("search")
+
+		pageNumber, _ := strconv.Atoi(page)
+		limitNumber, _ := strconv.Atoi(limit)
+		offset := (pageNumber - 1) * limitNumber
+
+		posts, paginate, err := h.service.FindAll(&dto.FilterParams{
+			Page:   pageNumber,
+			Limit:  limitNumber,
+			Offset: offset,
+			Search: search,
+	*/
+
+	/// with param filter
+	var paramUserID int
+	userID, _ := c.Get("userId")
+	paramUserID = userID.(int)
+
+	filter := helpers.ResponseFilterParams(c)
+	response, paginate, err := h.services.FindAll(filter, paramUserID)
+	if err != nil {
+		helpers.ErrorHandler(c, err)
+		return
+	}
+
+	res := helpers.Response(helpers.ResponseParams{
+		StatusCode: http.StatusOK,
+		Message:    "success get all user team",
+		Paginate:   paginate,
+		Data:       response,
+	})
+
+	c.JSON(http.StatusOK, res)
+}
+
 func (h *teamHandler) Detail(c *gin.Context) {
 	idStr := c.Param("id")
 	idInt, _ := strconv.Atoi(idStr)

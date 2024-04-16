@@ -11,7 +11,8 @@ import (
 func ErrorHandler(c *gin.Context, err error) {
 	var statusCode int
 
-	switch err.(type) {
+	/// type assertions switch
+	switch err.(type) { // the type can handle from struct error
 	case *NotFoundError:
 		statusCode = http.StatusNotFound
 

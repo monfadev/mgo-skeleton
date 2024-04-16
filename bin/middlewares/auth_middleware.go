@@ -33,9 +33,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		}
 
 		fmt.Println("\n\n\n")
-		fmt.Printf("userId without pointer is %v", userId)
-		fmt.Println("\n")
-		fmt.Printf("userId with pointer is %v", *userId)
+		fmt.Println("userId with pointer is ", *userId)
 		fmt.Println("\n\n\n")
 
 		ctx.Set("userId", *userId)

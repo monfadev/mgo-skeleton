@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"mgo-skeleton/bin/modules/team/models"
+	"mgo-skeleton/bin/pkg/helpers"
 
 	"gorm.io/gorm"
 )
@@ -11,6 +12,10 @@ import (
 type TeamRepository interface {
 	EmailExist(email string) bool
 	Create(req *models.TeamModel) error
+
+	TotalData(params *helpers.FilterParams, userId int) (int64, error)
+	FindAll(params *helpers.FilterParams, userId int) (*[]models.TeamResponse, error)
+
 	Detail(id int) (models.TeamResponse, error)
 	Delete(id int, userId int) error
 }
@@ -36,6 +41,39 @@ func (r *teamRepository) Create(user *models.TeamModel) error {
 	err := r.db.Table("teams").Create(&user).Error
 
 	return err
+}
+
+func (r *teamRepository) TotalData(params *helpers.FilterParams, userId int) (int64, error) {
+	var response int64
+
+	query := r.db.Debug().Table("teams").Where("user_id = ?", userId)
+
+	if params.Search != "" {
+		search := fmt.Sprintf("%%%s%%", params.Search)
+		query.Where("lower(name) LIKE lower(?)", search)
+	}
+
+	err := query.Count(&response)
+	if err != nil {
+		return response, err.Error
+	}
+
+	return response, nil
+}
+
+func (r *teamRepository) FindAll(params *helpers.FilterParams, userId int) (*[]models.TeamResponse, error) {
+	var response []models.TeamResponse
+
+	query := r.db.Debug().Table("teams").Where("user_id = ?", userId)
+
+	if params.Search != "" {
+		search := fmt.Sprintf("%%%s%%", params.Search)
+		query.Where("lower(name) LIKE lower(?)", search)
+	}
+
+	err := query.Offset(params.Offset).Limit(params.Limit).Find(&response).Error
+
+	return &response, err
 }
 
 func (r *teamRepository) Detail(id int) (models.TeamResponse, error) {
