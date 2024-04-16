@@ -6,6 +6,9 @@ import (
 	"mgo-skeleton/bin/modules/team/models"
 	"mgo-skeleton/bin/modules/team/repositories"
 	"mgo-skeleton/bin/pkg/helpers"
+	"time"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type TeamService interface {
@@ -13,15 +16,18 @@ type TeamService interface {
 	FindAll(params *helpers.FilterParams, userId int) (*[]models.TeamResponse, *helpers.Paginate, error)
 	Detail(id int) (*models.TeamResponse, error)
 	Delete(id int, userId int) error
+	Update(id int, req *models.TeamRequest) error
 }
 
 type teamService struct {
 	repositories repositories.TeamRepository
+	validator    *validator.Validate
 }
 
 func NewTeamService(r repositories.TeamRepository) *teamService {
 	return &teamService{
 		repositories: r,
+		validator:    validator.New(),
 	}
 }
 
@@ -108,4 +114,37 @@ func (s *teamService) Delete(id int, userId int) error {
 	}
 
 	return nil
+}
+
+func (s *teamService) Update(id int, req *models.TeamRequest) error {
+	fmt.Println("update service is ", req)
+
+	if err := s.validator.Struct(req); err != nil {
+		return &helpers.BadRequestError{Message: err.Error(), MessageDev: "struct is not match with team request"}
+	}
+
+	detailUser, err := (s).Detail(id)
+
+	fmt.Println("detailUser is ", detailUser)
+
+	if err != nil {
+		return err
+	}
+
+	if req.UserId != detailUser.UserId {
+		return &helpers.BadRequestError{Message: "it is not your user team", MessageDev: "differences fk user_id"}
+	}
+
+	user := models.TeamModel{
+		Name:      req.Name,
+		Email:     req.Email,
+		Role:      req.Role,
+		UpdatedAt: time.Now(),
+	}
+
+	if err := s.repositories.Update(id, &user); err != nil {
+		return &helpers.InternalServerError{Message: err.Error()}
+	}
+
+	return err
 }

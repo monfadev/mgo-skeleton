@@ -18,6 +18,8 @@ type TeamRepository interface {
 
 	Detail(id int) (models.TeamResponse, error)
 	Delete(id int, userId int) error
+
+	Update(id int, req *models.TeamModel) error
 }
 
 type teamRepository struct {
@@ -91,5 +93,11 @@ func (r *teamRepository) Delete(id int, userId int) error {
 	var req models.TeamRequest
 	err := r.db.Debug().Table("teams").Where("id = ? and user_id = ?", id, userId).Delete(&req).Error
 	fmt.Println("repository data is ", req)
+	return err
+}
+
+func (r *teamRepository) Update(id int, req *models.TeamModel) error {
+	err := r.db.Debug().Table("teams").Where("id = ?", id).Updates(&req).Error
+
 	return err
 }

@@ -21,4 +21,5 @@ func TeamRoute(r *gin.RouterGroup, db *gorm.DB) {
 	r.GET("/team", teamHandler.Get)
 	r.GET("/:id/team", teamHandler.Detail)
 	r.DELETE("/:id/team", teamHandler.Delete)
+	r.PUT("/:id/team", teamHandler.Update)
 }

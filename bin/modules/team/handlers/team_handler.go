@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"mgo-skeleton/bin/modules/team/models"
 	"mgo-skeleton/bin/modules/team/services"
 	"mgo-skeleton/bin/pkg/helpers"
@@ -25,6 +26,7 @@ func (h *teamHandler) Create(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		helpers.ErrorHandler(c, &helpers.BadRequestError{Message: err.Error()})
+		return
 	}
 
 	userID, _ := c.Get("userId")
@@ -122,4 +124,34 @@ func (h *teamHandler) Delete(c *gin.Context) {
 	})
 
 	c.JSON(http.StatusOK, res)
+}
+
+func (h *teamHandler) Update(c *gin.Context) {
+	var user models.TeamRequest
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+		helpers.ErrorHandler(c, &helpers.BadRequestError{Message: err.Error()})
+		return
+	}
+
+	idStr := c.Param("id")
+	idInt, _ := strconv.Atoi(idStr)
+
+	userID, _ := c.Get("userId")
+	user.UserId = userID.(int)
+
+	fmt.Println("update handler is ", user)
+
+	if err := h.services.Update(idInt, &user); err != nil {
+		helpers.ErrorHandler(c, err)
+		return
+	}
+
+	res := helpers.Response(helpers.ResponseParams{
+		StatusCode: http.StatusCreated,
+		Message:    "update user successfully",
+	})
+
+	c.JSON(http.StatusCreated, res)
+
 }
