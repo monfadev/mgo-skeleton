@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  mgo-skeleton-db:
+    image: postgres:14
+    container_name: mgo-skeleton-db
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=mgoskeleton
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  mgo-skeleton:
+    image: monfadev/mgo-skeleton:1.0.2
+    platform: linux/amd64    
+    container_name: mgo-skeleton
+    ports:
+      - 8080:8080
+    environment:
+      - DB_URL=postgres://postgres:postgres@5432/mgoskeleton?sslmode=disable&TimeZone=Asia/Jakarta
+      - DB_HOST=mgo-skeleton-db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=mgoskeleton
+      - DB_PORT=5432
+      - KEY_JWT=m905k3l3t0n
+      - DB_TABLE_USERS=users
+      - DB_TABLE_TEAMS=teams
+    env_file:
+      - .env
+
+volumes:
+  postgres-data:
+    driver: local
