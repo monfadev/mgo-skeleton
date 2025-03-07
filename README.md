@@ -35,3 +35,6 @@ rollback from migration up
 
 - Ensure database created
 - migrate -database "postgres://postgres:postgres@localhost:5432/mgoskeleton?sslmode=disable&TimeZone=Asia/Jakarta" -path migrations up
+
+<img width="925" alt="Screenshot 2025-03-02 at 13 47 01" src="https://github.com/user-attachments/assets/331197d1-d7af-4ffa-a350-d4e9f4c57510" />
+
